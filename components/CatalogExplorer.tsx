@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import {
+  ArrowLeft,
   ChevronDown,
   Clock3,
   Film,
@@ -123,6 +124,7 @@ function DetailModal({
   const [details, setDetails] = useState<MediaDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [showTrailer, setShowTrailer] = useState(false);
   const type = getMediaType(item);
 
   useEffect(() => {
@@ -131,6 +133,7 @@ function DetailModal({
     const loadDetails = async () => {
       setLoading(true);
       setError(false);
+      setShowTrailer(false);
       try {
         const response = await fetch(`/api/catalog/${type}/${item.id}`, {
           signal: controller.signal,
@@ -191,6 +194,26 @@ function DetailModal({
           <X size={21} />
         </button>
 
+        {showTrailer && trailer ? (
+          <div className="relative aspect-video w-full bg-black">
+            <iframe
+              src={`https://www.youtube-nocookie.com/embed/${trailer.key}?autoplay=1&rel=0`}
+              title={`Tráiler de ${title}`}
+              className="absolute inset-0 h-full w-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            />
+            <button
+              type="button"
+              onClick={() => setShowTrailer(false)}
+              className="absolute left-4 top-4 z-20 flex cursor-pointer items-center gap-2 rounded-full border border-white/20 bg-black/70 px-4 py-2 text-xs font-bold text-white shadow-xl backdrop-blur-md transition hover:border-[#ed263b] hover:bg-[#ed263b]"
+            >
+              <ArrowLeft size={15} /> Volver a la ficha
+            </button>
+          </div>
+        ) : (
+          <>
         <div className="relative min-h-52 overflow-hidden sm:min-h-[260px]">
           {data.backdrop_path && (
             <Image
@@ -271,14 +294,13 @@ function DetailModal({
                     ))}
                   </div>
                   {trailer && (
-                    <a
-                      href={`https://www.youtube.com/watch?v=${trailer.key}`}
-                      target="_blank"
-                      rel="noreferrer"
+                    <button
+                      type="button"
+                      onClick={() => setShowTrailer(true)}
                       className="ml-auto inline-flex items-center gap-2 rounded-full bg-[#ed263b] px-4 py-2 text-xs font-bold text-white shadow-[0_10px_28px_rgba(237,38,59,0.2)] transition hover:bg-[#ff4053]"
                     >
-                      <Play size={14} fill="currentColor" /> Ver tráiler
-                    </a>
+                      <Play size={14} fill="currentColor" /> Ver tráiler aquí
+                    </button>
                   )}
                 </div>
 
@@ -359,6 +381,8 @@ function DetailModal({
             ) : null}
           </div>
         </div>
+          </>
+        )}
       </div>
     </div>
   );
