@@ -329,6 +329,30 @@ export default function CatalogExplorer({
   const [selectedItem, setSelectedItem] = useState<MediaItem | null>(null);
 
   useEffect(() => {
+    const handleNavigationFilter = (event: Event) => {
+      const detail = (event as CustomEvent<{ type: CatalogType }>).detail;
+      if (!detail?.type) return;
+
+      setMediaType(detail.type);
+      setQuery("");
+      setGenre("all");
+    };
+
+    window.addEventListener("catalog-filter", handleNavigationFilter);
+    return () => window.removeEventListener("catalog-filter", handleNavigationFilter);
+  }, []);
+
+  useEffect(() => {
+    const handleOpenDetails = (event: Event) => {
+      const detail = (event as CustomEvent<{ item: MediaItem }>).detail;
+      if (detail?.item) setSelectedItem(detail.item);
+    };
+
+    window.addEventListener("catalog-open", handleOpenDetails);
+    return () => window.removeEventListener("catalog-open", handleOpenDetails);
+  }, []);
+
+  useEffect(() => {
     const controller = new AbortController();
     const timeout = window.setTimeout(async () => {
       setLoading(true);
@@ -390,6 +414,7 @@ export default function CatalogExplorer({
               className="absolute left-4 top-1/2 -translate-y-1/2 text-[#77808d] transition group-focus-within:text-[#ff3d4f]"
             />
             <input
+              id="catalog-search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Buscar película o serie..."
@@ -404,6 +429,7 @@ export default function CatalogExplorer({
               className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#77808d]"
             />
             <select
+              id="catalog-genre"
               value={genre}
               onChange={(event) => setGenre(event.target.value)}
               className="h-14 min-w-48 appearance-none border border-white/15 bg-[#0e1218] pl-11 pr-10 text-sm font-semibold text-[#d8dde5] outline-none transition focus:border-[#ffc34a]/70"
@@ -434,7 +460,12 @@ export default function CatalogExplorer({
           <button
             key={value}
             type="button"
-            onClick={() => setMediaType(value)}
+            onClick={() => {
+              setMediaType(value);
+              window.dispatchEvent(
+                new CustomEvent("catalog-state-change", { detail: { type: value } }),
+              );
+            }}
             className={`flex shrink-0 cursor-pointer items-center gap-2 border-b-2 px-1 pb-3 text-sm font-bold transition ${
               mediaType === value
                 ? "border-[#ff3d4f] text-white"

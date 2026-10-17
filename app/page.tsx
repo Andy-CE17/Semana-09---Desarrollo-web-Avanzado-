@@ -1,59 +1,16 @@
 import Image from "next/image";
-import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { Info, Play, Search, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import CatalogExplorer from "@/components/CatalogExplorer";
+import FeaturedActions from "@/components/FeaturedActions";
+import SiteHeader, { Wordmark } from "@/components/SiteHeader";
 import { getHomeCatalog, imageUrl, titleOf, yearOf } from "@/lib/tmdb";
-
-function Wordmark() {
-  return (
-    <span className="flex items-center gap-3" aria-label="Cinética">
-      <span className="relative block h-8 w-8 border-2 border-[#ff3d4f]">
-        <span className="absolute -right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 bg-[#ff3d4f]" />
-      </span>
-      <span className="text-[1.05rem] font-black tracking-[0.28em] text-white">
-        CINÉTICA
-      </span>
-    </span>
-  );
-}
-
-function Header() {
-  return (
-    <header className="absolute inset-x-0 top-0 z-30 border-b border-white/10 bg-[#07090d]/70 backdrop-blur-xl">
-      <div className="mx-auto flex h-[76px] max-w-[1480px] items-center justify-between px-5 sm:px-8 lg:px-12">
-        <Link href="/" aria-label="Cinética - Inicio">
-          <Wordmark />
-        </Link>
-
-        <nav
-          className="hidden h-full items-center gap-9 text-[0.82rem] font-semibold text-white/60 md:flex"
-          aria-label="Navegación principal"
-        >
-          <Link href="/" className="flex h-full items-center border-b-2 border-[#ff3d4f] text-white">
-            Inicio
-          </Link>
-          <Link href="#catalogo" className="transition hover:text-white">Películas</Link>
-          <Link href="#catalogo" className="transition hover:text-white">Series</Link>
-          <Link href="#catalogo" className="transition hover:text-white">Géneros</Link>
-        </nav>
-
-        <Link
-          href="#catalogo"
-          className="flex h-10 items-center gap-2 border border-white/20 px-4 text-xs font-bold text-white transition hover:border-[#ff3d4f] hover:bg-[#ff3d4f] sm:text-sm"
-        >
-          <Search size={16} strokeWidth={2} /> Buscar
-        </Link>
-      </div>
-    </header>
-  );
-}
 
 function GalleryLoading() {
   return (
     <main className="min-h-screen bg-[#07090d]">
-      <Header />
+      <SiteHeader />
       <div className="flex min-h-screen items-center justify-center">
         <div className="h-1 w-44 overflow-hidden bg-white/10">
           <div className="h-full w-2/3 animate-pulse bg-[#ff3d4f]" />
@@ -74,7 +31,7 @@ async function GalleryContent() {
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#07090d]">
-      <Header />
+      <SiteHeader />
 
       <section className="relative min-h-[86vh] overflow-hidden border-b border-white/10">
         {backdrop && (
@@ -117,20 +74,7 @@ async function GalleryContent() {
               {featured.overview || "Uno de los títulos más vistos de esta semana."}
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="#catalogo"
-                className="flex h-12 items-center gap-2 bg-[#ff3d4f] px-6 text-sm font-extrabold text-white shadow-[0_15px_40px_rgba(255,61,79,0.22)] transition hover:bg-[#e82e41]"
-              >
-                <Play size={17} fill="currentColor" /> Explorar títulos
-              </Link>
-              <Link
-                href="#catalogo"
-                className="flex h-12 items-center gap-2 border border-white/25 bg-black/25 px-6 text-sm font-bold text-white backdrop-blur transition hover:border-white/50 hover:bg-white/10"
-              >
-                <Info size={18} /> Más información
-              </Link>
-            </div>
+            <FeaturedActions item={featured} />
           </div>
         </div>
 
