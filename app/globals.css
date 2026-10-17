@@ -27,6 +27,10 @@ html {
   scroll-behavior: smooth;
 }
 
+.font-editorial {
+  font-family: var(--font-editorial), Georgia, serif;
+}
+
 ::selection {
   background: #ff4d6d;
   color: #ffffff;

@@ -45,12 +45,13 @@ function isMediaItem(item: MediaItem) {
 }
 
 export async function getHomeCatalog() {
-  const [trending, movies, series, movieGenres, tvGenres] = await Promise.all([
+  const [trending, movies, series, movieGenres, tvGenres, heroMovie] = await Promise.all([
     tmdbRequest<TmdbListResponse>("/trending/all/week"),
     tmdbRequest<TmdbListResponse>("/movie/popular", { page: 1 }),
     tmdbRequest<TmdbListResponse>("/tv/popular", { page: 1 }),
     tmdbRequest<GenreResponse>("/genre/movie/list"),
     tmdbRequest<GenreResponse>("/genre/tv/list"),
+    tmdbRequest<MediaDetails>("/movie/693134"),
   ]);
 
   const trendingItems = trending.results.filter(isMediaItem);
@@ -77,9 +78,20 @@ export async function getHomeCatalog() {
       ),
   );
 
-  const featured =
-    trendingItems.find((item) => item.backdrop_path && item.overview) ??
-    initialItems[0];
+  const featured: MediaItem = {
+    id: heroMovie.id,
+    media_type: "movie",
+    title: heroMovie.title,
+    original_title: heroMovie.original_title,
+    overview: heroMovie.overview,
+    poster_path: heroMovie.poster_path,
+    backdrop_path: heroMovie.backdrop_path,
+    release_date: heroMovie.release_date,
+    vote_average: heroMovie.vote_average,
+    vote_count: heroMovie.vote_count,
+    genre_ids: heroMovie.genres.map((genre) => genre.id),
+    popularity: 0,
+  };
 
   return { featured, initialItems: initialItems.slice(0, 30), genres };
 }

@@ -5,7 +5,6 @@ import {
   ChevronDown,
   Clock3,
   Film,
-  Grid3X3,
   LoaderCircle,
   Play,
   Search,
@@ -64,7 +63,7 @@ function MediaCard({
   const title = getTitle(item);
 
   return (
-    <article className="group relative overflow-hidden border border-white/10 bg-[#10141a] shadow-[0_18px_45px_rgba(0,0,0,0.3)] transition duration-300 hover:-translate-y-1.5 hover:border-[#ff3d4f]/60 hover:shadow-[0_22px_60px_rgba(0,0,0,0.55)]">
+    <article className="group relative overflow-hidden rounded-[5px] border border-white/10 bg-[#10141a] shadow-[0_18px_45px_rgba(0,0,0,0.3)] transition duration-300 hover:-translate-y-1.5 hover:border-[#ed263b] hover:shadow-[0_24px_65px_rgba(0,0,0,0.65),0_0_24px_rgba(237,38,59,0.15)] hover:ring-2 hover:ring-[#ed263b] hover:ring-offset-2 hover:ring-offset-[#080b10] focus-within:ring-2 focus-within:ring-[#ed263b]">
       <button
         type="button"
         onClick={() => onSelect(item)}
@@ -78,7 +77,7 @@ function MediaCard({
               alt={`Póster de ${title}`}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-              className="object-cover transition duration-700 group-hover:scale-[1.06]"
+              className="object-cover transition duration-700 ease-out group-hover:scale-[1.075] group-hover:saturate-[0.72]"
             />
           ) : (
             <div className="flex h-full items-center justify-center text-white/20">
@@ -86,16 +85,20 @@ function MediaCard({
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-[#080b10] via-transparent to-transparent opacity-70" />
-          <div className="absolute left-0 top-3 border-l-2 border-[#ff3d4f] bg-black/75 px-3 py-1.5 text-[0.62rem] font-bold uppercase tracking-[0.18em] text-white backdrop-blur-md">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(237,38,59,0.08),rgba(3,4,7,0.82))] opacity-0 backdrop-blur-[1px] transition duration-300 group-hover:opacity-100" />
+          <div className="absolute left-0 top-3 border-l-2 border-[#ff3d4f] bg-black/75 px-3 py-1.5 text-[0.62rem] font-bold uppercase tracking-[0.18em] text-white backdrop-blur-md transition duration-300 group-hover:translate-x-1">
             {type === "movie" ? "Película" : "Serie"}
           </div>
           <div className="absolute right-3 top-3 flex items-center gap-1 bg-[#ffc34a] px-2.5 py-1 text-xs font-black text-[#171209] shadow-lg">
             <Star size={12} fill="currentColor" />
             {item.vote_average ? item.vote_average.toFixed(1) : "N/A"}
           </div>
-          <div className="absolute inset-x-3 bottom-3 translate-y-3 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-            <span className="flex items-center justify-center gap-2 bg-[#ff3d4f] px-4 py-3 text-sm font-bold text-white shadow-xl">
-              <Play size={15} fill="currentColor" /> Ver detalles
+          <div className="absolute inset-0 flex scale-90 flex-col items-center justify-center gap-3 opacity-0 transition duration-300 group-hover:scale-100 group-hover:opacity-100">
+            <span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/35 bg-[#ed263b] text-white shadow-[0_12px_34px_rgba(237,38,59,0.45)] transition group-hover:scale-100">
+              <Play className="ml-0.5" size={20} fill="currentColor" />
+            </span>
+            <span className="text-[0.68rem] font-black uppercase tracking-[0.2em] text-white">
+              Ver ficha
             </span>
           </div>
         </div>
@@ -166,10 +169,11 @@ function DetailModal({
     (video) => video.site === "YouTube" && video.type === "Trailer",
   );
   const cast = details?.credits?.cast.slice(0, 5) ?? [];
+  const originalTitle = data.original_title ?? data.original_name;
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-end justify-center bg-black/85 p-0 backdrop-blur-sm sm:items-center sm:p-6"
+      className="fixed inset-0 z-[100] flex items-end justify-center bg-black/90 p-0 backdrop-blur-md sm:items-center sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-label={`Detalles de ${title}`}
@@ -177,37 +181,38 @@ function DetailModal({
         if (event.currentTarget === event.target) onClose();
       }}
     >
-      <div className="relative max-h-[94vh] w-full max-w-5xl overflow-y-auto border border-white/10 bg-[#0c1118] shadow-[0_30px_120px_rgba(0,0,0,0.8)]">
+      <div className="relative max-h-[92vh] w-full max-w-6xl overflow-y-auto border border-white/10 bg-[#0a0c11] shadow-[0_35px_140px_rgba(0,0,0,0.9)] sm:rounded-2xl xl:overflow-hidden">
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 z-20 flex h-11 w-11 cursor-pointer items-center justify-center border border-white/15 bg-black/65 text-white transition hover:border-[#ff3d4f] hover:bg-[#ff3d4f]"
+          className="absolute right-4 top-4 z-30 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-black/65 text-white shadow-xl backdrop-blur-md transition hover:border-[#ed263b] hover:bg-[#ed263b]"
           aria-label="Cerrar detalles"
         >
           <X size={21} />
         </button>
 
-        <div className="relative min-h-56 overflow-hidden sm:min-h-72">
+        <div className="relative min-h-52 overflow-hidden sm:min-h-[260px]">
           {data.backdrop_path && (
             <Image
               src={`${IMAGE_BASE}/w1280${data.backdrop_path}`}
               alt=""
               fill
               sizes="(max-width: 1024px) 100vw, 1024px"
-              className="object-cover opacity-55"
+              className="object-cover opacity-75"
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0c1118] via-[#0c1118]/45 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#080a0e]/80 via-transparent to-[#080a0e]/35" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0c11] via-[#0a0c11]/20 to-black/15" />
         </div>
 
-        <div className="relative -mt-24 grid gap-7 px-5 pb-8 sm:grid-cols-[190px_1fr] sm:px-9">
-          <div className="relative mx-auto aspect-[2/3] w-40 overflow-hidden border border-white/15 bg-[#171c24] shadow-2xl sm:mx-0 sm:w-[190px]">
+        <div className="relative -mt-16 grid gap-6 px-5 pb-7 sm:-mt-20 sm:grid-cols-[170px_1fr] sm:px-8 lg:gap-8 lg:px-10">
+          <div className="relative mx-auto aspect-[2/3] w-36 overflow-hidden rounded-lg border border-white/15 bg-[#171c24] shadow-[0_25px_70px_rgba(0,0,0,0.65)] sm:mx-0 sm:w-[170px]">
             {data.poster_path ? (
               <Image
                 src={`${IMAGE_BASE}/w500${data.poster_path}`}
                 alt={`Póster de ${title}`}
                 fill
-                sizes="190px"
+                sizes="170px"
                 className="object-cover"
               />
             ) : (
@@ -217,23 +222,30 @@ function DetailModal({
             )}
           </div>
 
-          <div className="pt-1 sm:pt-20">
-            <div className="mb-3 flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#ffc34a]">
-              <span>{type === "movie" ? "Película" : "Serie"}</span>
-              <span className="text-white/25">•</span>
-              <span>{getYear(data)}</span>
+          <div className="pt-0 sm:pt-10">
+            <div className="mb-3 flex flex-wrap items-center gap-2 text-[0.64rem] font-bold uppercase tracking-[0.14em]">
+              <span className="rounded-full bg-[#ed263b] px-3 py-1.5 text-white">
+                {type === "movie" ? "Película" : "Serie"}
+              </span>
+              <span className="rounded-full border border-white/15 bg-black/25 px-3 py-1.5 text-white/65 backdrop-blur-sm">
+                {getYear(data)}
+              </span>
               {details?.status && (
-                <>
-                  <span className="text-white/25">•</span>
-                  <span>{details.status}</span>
-                </>
+                <span className="rounded-full border border-white/15 bg-black/25 px-3 py-1.5 text-white/65 backdrop-blur-sm">
+                  {details.status}
+                </span>
               )}
             </div>
-            <h2 className="max-w-3xl text-3xl font-black tracking-[-0.04em] text-white sm:text-5xl">
+            <h2 className="max-w-3xl text-3xl font-black leading-[1.02] tracking-[-0.045em] text-white sm:text-4xl">
               {title}
             </h2>
+            {originalTitle && originalTitle !== title && (
+              <p className="mt-2 text-xs font-medium uppercase tracking-[0.13em] text-white/35">
+                Título original · {originalTitle}
+              </p>
+            )}
             {details?.tagline && (
-              <p className="mt-2 text-sm italic text-[#aab2bf]">“{details.tagline}”</p>
+              <p className="mt-2 max-w-2xl text-xs italic text-white/55">“{details.tagline}”</p>
             )}
 
             {loading ? (
@@ -247,66 +259,102 @@ function DetailModal({
               </p>
             ) : details ? (
               <>
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {details.genres.map((genre) => (
-                    <span
-                      key={genre.id}
-                      className="border border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs font-semibold text-[#d5dae2]"
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <div className="flex flex-wrap gap-2">
+                    {details.genres.map((genre) => (
+                      <span
+                        key={genre.id}
+                        className="rounded-full border border-white/10 bg-white/[0.055] px-3 py-1.5 text-[0.68rem] font-semibold text-white/65"
+                      >
+                        {genre.name}
+                      </span>
+                    ))}
+                  </div>
+                  {trailer && (
+                    <a
+                      href={`https://www.youtube.com/watch?v=${trailer.key}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="ml-auto inline-flex items-center gap-2 rounded-full bg-[#ed263b] px-4 py-2 text-xs font-bold text-white shadow-[0_10px_28px_rgba(237,38,59,0.2)] transition hover:bg-[#ff4053]"
                     >
-                      {genre.name}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="mt-6 flex flex-wrap gap-5 text-sm text-[#c5ccd6]">
-                  <span className="flex items-center gap-2">
-                    <Star size={17} fill="#ffc34a" className="text-[#ffc34a]" />
-                    <strong className="text-white">{details.vote_average.toFixed(1)}</strong>
-                    / 10
-                  </span>
-                  <span className="flex items-center gap-2">
-                    <Users size={17} className="text-[#ff3d4f]" />
-                    {details.vote_count.toLocaleString("es-PE")} votos
-                  </span>
-                  {formatRuntime(details) && (
-                    <span className="flex items-center gap-2">
-                      <Clock3 size={17} className="text-[#ff3d4f]" />
-                      {formatRuntime(details)}
-                    </span>
-                  )}
-                  {type === "tv" && details.number_of_seasons && (
-                    <span className="flex items-center gap-2">
-                      <Tv size={17} className="text-[#ff3d4f]" />
-                      {details.number_of_seasons} temporadas
-                    </span>
+                      <Play size={14} fill="currentColor" /> Ver tráiler
+                    </a>
                   )}
                 </div>
 
-                <p className="mt-6 max-w-3xl text-[0.98rem] leading-7 text-[#b9c0cb]">
-                  {details.overview || "La sinopsis todavía no está disponible en español."}
-                </p>
+                <div className="mt-4 grid grid-cols-2 overflow-hidden rounded-xl border border-white/10 bg-white/[0.035] sm:grid-cols-4">
+                  <div className="border-b border-r border-white/8 p-2.5 sm:border-b-0">
+                    <span className="flex items-center gap-1.5 text-[0.62rem] font-bold uppercase tracking-[0.13em] text-white/35">
+                      <Star size={13} className="text-[#ffc34a]" fill="currentColor" /> Puntuación
+                    </span>
+                    <p className="mt-1 text-sm font-black text-white">
+                      {details.vote_average.toFixed(1)} <span className="text-xs font-medium text-white/35">/ 10</span>
+                    </p>
+                  </div>
+                  <div className="border-b border-white/8 p-2.5 sm:border-b-0 sm:border-r">
+                    <span className="flex items-center gap-1.5 text-[0.62rem] font-bold uppercase tracking-[0.13em] text-white/35">
+                      <Clock3 size={13} className="text-[#ed263b]" /> Duración
+                    </span>
+                    <p className="mt-1 text-sm font-black text-white">
+                      {formatRuntime(details) ?? "No disponible"}
+                    </p>
+                  </div>
+                  <div className="border-r border-white/8 p-2.5">
+                    <span className="flex items-center gap-1.5 text-[0.62rem] font-bold uppercase tracking-[0.13em] text-white/35">
+                      <Users size={13} className="text-[#ed263b]" /> Valoraciones
+                    </span>
+                    <p className="mt-1 text-sm font-black text-white">
+                      {details.vote_count.toLocaleString("es-PE")}
+                    </p>
+                  </div>
+                  <div className="p-2.5">
+                    <span className="flex items-center gap-1.5 text-[0.62rem] font-bold uppercase tracking-[0.13em] text-white/35">
+                      <Tv size={13} className="text-[#ed263b]" /> {type === "tv" ? "Temporadas" : "Estreno"}
+                    </span>
+                    <p className="mt-1 text-sm font-black text-white">
+                      {type === "tv" ? details.number_of_seasons ?? "—" : getYear(details)}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-5">
+                  <h3 className="text-[0.68rem] font-black uppercase tracking-[0.19em] text-white/40">
+                    Sinopsis
+                  </h3>
+                  <p className="mt-2 max-w-4xl text-sm leading-6 text-white/65">
+                    {details.overview || "La sinopsis todavía no está disponible en español."}
+                  </p>
+                </div>
 
                 {cast.length > 0 && (
-                  <div className="mt-7">
-                    <h3 className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-[#7f8998]">
+                  <div className="mt-5 border-t border-white/8 pt-4">
+                    <h3 className="mb-3 text-[0.64rem] font-black uppercase tracking-[0.18em] text-white/40">
                       Reparto principal
                     </h3>
-                    <p className="text-sm leading-6 text-[#d8dde5]">
-                      {cast.map((person) => person.name).join(" · ")}
-                    </p>
+                    <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+                      {cast.map((person) => (
+                        <div key={person.id} className="min-w-0">
+                          <div className="relative mb-1.5 aspect-square w-10 overflow-hidden rounded-full border border-white/10 bg-white/[0.05]">
+                            {person.profile_path ? (
+                              <Image
+                                src={`${IMAGE_BASE}/w185${person.profile_path}`}
+                                alt={person.name}
+                                fill
+                                sizes="40px"
+                                className="object-cover"
+                              />
+                            ) : (
+                              <Users className="absolute inset-0 m-auto text-white/20" size={18} />
+                            )}
+                          </div>
+                          <p className="truncate text-[0.68rem] font-bold text-white/80">{person.name}</p>
+                          <p className="mt-0.5 truncate text-[0.62rem] text-white/35">{person.character}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
 
-                {trailer && (
-                  <a
-                    href={`https://www.youtube.com/watch?v=${trailer.key}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-7 inline-flex items-center gap-2 bg-[#ff3d4f] px-5 py-3 text-sm font-bold text-white shadow-[0_12px_35px_rgba(255,61,79,0.25)] transition hover:bg-[#e82e41]"
-                  >
-                    <Play size={17} fill="currentColor" /> Ver tráiler
-                  </a>
-                )}
               </>
             ) : null}
           </div>
@@ -340,6 +388,20 @@ export default function CatalogExplorer({
 
     window.addEventListener("catalog-filter", handleNavigationFilter);
     return () => window.removeEventListener("catalog-filter", handleNavigationFilter);
+  }, []);
+
+  useEffect(() => {
+    const handleHeaderSearch = (event: Event) => {
+      const detail = (event as CustomEvent<{ query: string }>).detail;
+      if (!detail?.query) return;
+
+      setQuery(detail.query);
+      setMediaType("all");
+      setGenre("all");
+    };
+
+    window.addEventListener("catalog-search", handleHeaderSearch);
+    return () => window.removeEventListener("catalog-search", handleHeaderSearch);
   }, []);
 
   useEffect(() => {
@@ -393,46 +455,73 @@ export default function CatalogExplorer({
 
   return (
     <section id="catalogo" className="relative mx-auto max-w-[1480px] px-5 py-16 sm:px-8 lg:px-12 lg:py-20">
-      <div className="mb-9 flex flex-col gap-6 border-b border-white/10 pb-8 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <p className="mb-3 flex items-center gap-3 text-[0.67rem] font-bold uppercase tracking-[0.25em] text-[#ff6977]">
-            <span className="h-px w-8 bg-[#ff3d4f]" /> Catálogo
-          </p>
-          <h2 className="text-3xl font-black tracking-[-0.035em] text-white sm:text-5xl">
+      <div className="mb-8">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <h2 className="text-3xl font-black tracking-[-0.035em] text-white sm:text-4xl">
             {heading}
           </h2>
-          <p className="mt-3 text-sm text-[#8e99a8]">
-            {loading ? "Actualizando resultados..." : `${items.length} títulos disponibles`}
+          <p className="pb-1 text-sm text-white/45">
+            {loading ? "Actualizando..." : `${items.length} títulos`}
           </p>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-[minmax(310px,1fr)_auto] lg:w-[670px]">
-          <label className="group relative">
+        <div className="mt-6 flex flex-col gap-2 rounded-xl border border-white/10 bg-white/[0.035] p-2 shadow-[0_18px_50px_rgba(0,0,0,0.18)] backdrop-blur-sm lg:flex-row lg:items-center">
+          <div className="grid grid-cols-3 rounded-lg bg-black/30 p-1 lg:w-auto lg:min-w-[290px]">
+            {(
+              [
+                ["all", "Todo"],
+                ["movie", "Películas"],
+                ["tv", "Series"],
+              ] as const
+            ).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => {
+                  setMediaType(value);
+                  window.dispatchEvent(
+                    new CustomEvent("catalog-state-change", { detail: { type: value } }),
+                  );
+                }}
+                className={`cursor-pointer rounded-md px-4 py-2.5 text-sm font-bold transition ${
+                  mediaType === value
+                    ? "bg-[#ed263b] text-white shadow-[0_6px_18px_rgba(237,38,59,0.22)]"
+                    : "text-white/50 hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <span className="hidden h-7 w-px bg-white/10 lg:block" />
+
+          <label className="group relative min-w-0 flex-1">
             <span className="sr-only">Buscar película o serie</span>
             <Search
               size={18}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-[#77808d] transition group-focus-within:text-[#ff3d4f]"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-white/35 transition group-focus-within:text-[#ed263b]"
             />
             <input
               id="catalog-search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar película o serie..."
-              className="h-14 w-full border border-white/15 bg-[#0e1218] pl-12 pr-4 text-sm text-white outline-none transition placeholder:text-[#697382] focus:border-[#ff3d4f] focus:bg-[#11161e]"
+              placeholder="Buscar por título"
+              className="h-12 w-full rounded-lg border border-transparent bg-black/20 pl-12 pr-4 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-white/15 focus:bg-black/35"
             />
           </label>
 
-          <label className="relative">
+          <label className="relative lg:w-[210px]">
             <span className="sr-only">Filtrar por género</span>
             <SlidersHorizontal
-              size={16}
-              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#77808d]"
+              size={15}
+              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/35"
             />
             <select
               id="catalog-genre"
               value={genre}
               onChange={(event) => setGenre(event.target.value)}
-              className="h-14 min-w-48 appearance-none border border-white/15 bg-[#0e1218] pl-11 pr-10 text-sm font-semibold text-[#d8dde5] outline-none transition focus:border-[#ffc34a]/70"
+              className="h-12 w-full appearance-none rounded-lg border border-transparent bg-black/20 pl-11 pr-10 text-sm font-semibold text-white/70 outline-none transition focus:border-white/15 focus:bg-black/35"
             >
               <option value="all">Todos los géneros</option>
               {genres.map((genreOption) => (
@@ -442,39 +531,11 @@ export default function CatalogExplorer({
               ))}
             </select>
             <ChevronDown
-              size={16}
-              className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#ffc34a]"
+              size={15}
+              className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#ed263b]"
             />
           </label>
         </div>
-      </div>
-
-      <div className="mb-8 flex w-full gap-7 overflow-x-auto border-b border-white/10 pb-0 sm:w-auto">
-        {(
-          [
-            ["all", "Todo", Grid3X3],
-            ["movie", "Películas", Film],
-            ["tv", "Series", Tv],
-          ] as const
-        ).map(([value, label, Icon]) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => {
-              setMediaType(value);
-              window.dispatchEvent(
-                new CustomEvent("catalog-state-change", { detail: { type: value } }),
-              );
-            }}
-            className={`flex shrink-0 cursor-pointer items-center gap-2 border-b-2 px-1 pb-3 text-sm font-bold transition ${
-              mediaType === value
-                ? "border-[#ff3d4f] text-white"
-                : "border-transparent text-[#8f98a6] hover:border-white/30 hover:text-white"
-            }`}
-          >
-            <Icon size={15} /> {label}
-          </button>
-        ))}
       </div>
 
       {error ? (
