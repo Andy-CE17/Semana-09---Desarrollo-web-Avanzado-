@@ -6,6 +6,7 @@ import type {
   MediaItem,
   MediaType,
   TmdbListResponse,
+  Video,
 } from "./tmdb-types";
 
 const TMDB_API_URL = "https://api.themoviedb.org/3";
@@ -137,12 +138,17 @@ export async function getMediaDetails(
   mediaType: MediaType,
   id: number,
 ): Promise<MediaDetails> {
-  const details = await tmdbRequest<Omit<MediaDetails, "media_type">>(
-    `/${mediaType}/${id}`,
-    { append_to_response: "credits,videos" },
-  );
+  const [details, videos] = await Promise.all([
+    tmdbRequest<Omit<MediaDetails, "media_type">>(`/${mediaType}/${id}`, {
+      append_to_response: "credits",
+    }),
+    tmdbRequest<{ results: Video[] }>(`/${mediaType}/${id}/videos`, {
+      language: "es-ES",
+      include_video_language: "es-ES,en-US,null",
+    }),
+  ]);
 
-  return { ...details, media_type: mediaType };
+  return { ...details, videos, media_type: mediaType };
 }
 
 export function imageUrl(path: string | null, size = "w500") {

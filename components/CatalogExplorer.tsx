@@ -168,9 +168,13 @@ function DetailModal({
 
   const data = details ?? item;
   const title = getTitle(data);
-  const trailer = details?.videos?.results.find(
-    (video) => video.site === "YouTube" && video.type === "Trailer",
-  );
+  const youtubeVideos =
+    details?.videos?.results.filter((video) => video.site === "YouTube") ?? [];
+  const trailer =
+    youtubeVideos.find((video) => video.type === "Trailer" && video.official) ??
+    youtubeVideos.find((video) => video.type === "Trailer") ??
+    youtubeVideos.find((video) => video.official) ??
+    youtubeVideos[0];
   const cast = details?.credits?.cast.slice(0, 5) ?? [];
   const originalTitle = data.original_title ?? data.original_name;
 
@@ -282,7 +286,7 @@ function DetailModal({
               </p>
             ) : details ? (
               <>
-                <div className="mt-4 flex flex-wrap items-center gap-2">
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-y border-white/8 py-3">
                   <div className="flex flex-wrap gap-2">
                     {details.genres.map((genre) => (
                       <span
@@ -293,14 +297,18 @@ function DetailModal({
                       </span>
                     ))}
                   </div>
-                  {trailer && (
+                  {trailer ? (
                     <button
                       type="button"
                       onClick={() => setShowTrailer(true)}
-                      className="ml-auto inline-flex items-center gap-2 rounded-full bg-[#ed263b] px-4 py-2 text-xs font-bold text-white shadow-[0_10px_28px_rgba(237,38,59,0.2)] transition hover:bg-[#ff4053]"
+                      className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#ed263b] px-4 py-2 text-xs font-bold text-white shadow-[0_10px_28px_rgba(237,38,59,0.2)] transition hover:-translate-y-0.5 hover:bg-[#ff4053]"
                     >
-                      <Play size={14} fill="currentColor" /> Ver tráiler aquí
+                      <Play size={14} fill="currentColor" /> Ver video aquí
                     </button>
+                  ) : (
+                    <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-4 py-2 text-xs font-semibold text-white/40">
+                      <Play size={14} /> Video oficial no disponible
+                    </span>
                   )}
                 </div>
 
